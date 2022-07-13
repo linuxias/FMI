@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         locationPermissionRequest.launch(REQUIRED_PERMISSIONS)
 
         locationProvider = LocationProvider(this)
+        updateCurrentLocationAddress()
 
         binding.btnRefresh.setOnClickListener {
             updateCurrentLocationAddress()
@@ -55,8 +56,9 @@ class MainActivity : AppCompatActivity() {
     fun updateCurrentLocationAddress() {
         locationProvider.receiveLocation {
             val address = convertLocationToAddress(this, it)
-            address?.run {
-                Log.d("TAG", "${address.countryName} ${address.locality}")
+            address?.let {
+                binding.locationTitle.text = "${it.countryName}"
+                binding.locationSubtitle.text = it.locality.toString() + " " + it.thoroughfare.toString()
             }
         }
     }
