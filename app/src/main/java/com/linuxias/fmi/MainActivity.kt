@@ -7,13 +7,16 @@ import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import com.linuxias.fmi.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
+    private lateinit var locationProvider: LocationProvider
 
     val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -26,7 +29,8 @@ class MainActivity : AppCompatActivity() {
                 // Only approximate location access granted.
             }
             else -> {
-                // No location access granted.
+                ActivityCompat.requestPermissions(this@MainActivity,
+                    REQUIRED_PERMISSIONS, PERMISSION_REQUEST_CODE)
             }
         }
     }
@@ -40,6 +44,18 @@ class MainActivity : AppCompatActivity() {
             showDialogForLocationServicesSetting()
         }
         locationPermissionRequest.launch(REQUIRED_PERMISSIONS)
+
+        locationProvider = LocationProvider(this)
+
+        binding.btnRefresh.setOnClickListener {
+            updateCurrentLocationAddress()
+        }
+    }
+
+    fun updateCurrentLocationAddress() {
+        locationProvider.receiveLocation {
+            //Update Address
+        }
     }
 
     private fun showDialogForLocationServicesSetting() {
@@ -82,5 +98,7 @@ class MainActivity : AppCompatActivity() {
             android.Manifest.permission.ACCESS_FINE_LOCATION,
             android.Manifest.permission.ACCESS_COARSE_LOCATION
         )
+
+        private val PERMISSION_REQUEST_CODE = 100
     }
 }
