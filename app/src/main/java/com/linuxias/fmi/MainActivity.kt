@@ -54,7 +54,10 @@ class MainActivity : AppCompatActivity() {
 
     fun updateCurrentLocationAddress() {
         locationProvider.receiveLocation {
-            //Update Address
+            val address = convertLocationToAddress(this, it)
+            address?.run {
+                Log.d("TAG", "${address.countryName} ${address.locality}")
+            }
         }
     }
 
