@@ -13,7 +13,7 @@ import com.google.android.gms.location.LocationServices
 import java.lang.Exception
 
 class LocationProvider(val context: Context) {
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var fusedLocationProviderClient: FusedLocationProviderClient
 
     init {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
