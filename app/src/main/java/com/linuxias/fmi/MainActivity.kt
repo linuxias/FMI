@@ -4,19 +4,26 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.location.LocationManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.linuxias.fmi.databinding.ActivityMainBinding
+import com.linuxias.fmi.repository.AirQualityViewModel
+import com.linuxias.fmi.repository.AirQualityViewModelFactory
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var locationProvider: LocationProvider
+    private lateinit var viewModel: AirQualityViewModel
 
     val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -48,6 +55,21 @@ class MainActivity : AppCompatActivity() {
         locationProvider = LocationProvider(this)
         updateCurrentLocationAddress()
 
+        val viewModelFactory = AirQualityViewModelFactory(FMIApplication.repository!!)
+
+        viewModel = ViewModelProvider(this, viewModelFactory)
+            .get(AirQualityViewModel::class.java)
+
+        viewModel.viewModelScope.launch {
+            viewModel.airQualityResponse.collect {
+                if (it != null) {
+                    binding.tvCount.text = it.data.current.pollution.aqius.toString()
+                    val date = Date(System.currentTimeMillis())
+                    binding.tvCheckTime.text = SimpleDateFormat("hh:mm:ss", Locale.KOREAN).format(date)
+                }
+            }
+        }
+
         binding.btnRefresh.setOnClickListener {
             updateCurrentLocationAddress()
         }
@@ -59,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             address?.let {
                 binding.locationTitle.text = "${it.countryName}"
                 binding.locationSubtitle.text = it.locality.toString() + " " + it.thoroughfare.toString()
+                viewModel.getAirQualityData(it.latitude.toString(), it.longitude.toString(), "fd135d67-8fbf-4ff2-b6e0-689bee044bd5")
             }
         }
     }

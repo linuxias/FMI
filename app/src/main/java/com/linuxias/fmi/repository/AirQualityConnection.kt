@@ -6,16 +6,18 @@ import retrofit2.converter.gson.GsonConverterFactory
 class AirQualityConnection {
     companion object {
         private const val BASE_URL = "https://api.airvisual.com/v2/"
-        private var INSTANCE: Retrofit? = null
+        @Volatile
+        private var INSTANCE: AirQualityApi? = null
 
-        fun Instance(): Retrofit {
-            if (INSTANCE == null) {
-                INSTANCE = Retrofit.Builder()
+        fun getService(): AirQualityApi? {
+            return INSTANCE ?: synchronized(this) {
+                val retrofit = Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
+                INSTANCE = retrofit.create(AirQualityApi::class.java)
+                INSTANCE
             }
-            return INSTANCE!!
         }
     }
 }
