@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         locationPermissionRequest.launch(REQUIRED_PERMISSIONS)
 
         locationProvider = LocationProvider(this)
-        updateCurrentLocationAddress()
+        updateCurrentLocationAndTime()
 
         val viewModelFactory = AirQualityViewModelFactory(FMIApplication.repository!!)
 
@@ -65,18 +65,16 @@ class MainActivity : AppCompatActivity() {
             viewModel.airQualityResponse.collect {
                 if (it != null) {
                     binding.tvCount.text = it.data.current.pollution.aqius.toString()
-                    val date = Date(System.currentTimeMillis())
-                    binding.tvCheckTime.text = SimpleDateFormat("hh:mm:ss", Locale.KOREAN).format(date)
                 }
             }
         }
 
         binding.btnRefresh.setOnClickListener {
-            updateCurrentLocationAddress()
+            updateCurrentLocationAndTime()
         }
     }
 
-    fun updateCurrentLocationAddress() {
+    fun updateCurrentLocationAndTime() {
         locationProvider.receiveLocation {
             val address = convertLocationToAddress(this, it)
             address?.let {
@@ -85,6 +83,9 @@ class MainActivity : AppCompatActivity() {
                 viewModel.getAirQualityData(it.latitude.toString(), it.longitude.toString(), getApiKey())
             }
         }
+
+        val date = Date(System.currentTimeMillis())
+        binding.tvCheckTime.text = SimpleDateFormat("hh:mm:ss", Locale.KOREAN).format(date)
     }
 
     private fun showDialogForLocationServicesSetting() {
