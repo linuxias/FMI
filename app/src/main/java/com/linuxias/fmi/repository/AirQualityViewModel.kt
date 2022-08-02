@@ -12,7 +12,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class AirQualityViewModel(private val repository: AirQualityRepository) : ViewModel() {
-    val airQualityResponse: MutableStateFlow<AirQualityResponse?> = MutableStateFlow(null)
+    var airQualityResponse: MutableStateFlow<AirQualityResponse?> = MutableStateFlow(null)
 
     fun getAirQualityData(lat: String, lon: String, key: String) {
         viewModelScope.launch {
@@ -23,7 +23,6 @@ class AirQualityViewModel(private val repository: AirQualityRepository) : ViewMo
                     response: Response<AirQualityResponse>
                 ) {
                     if (response.isSuccessful) {
-                        Log.d(TAG, "Get AirQuality data successfully")
                         airQualityResponse.value = response.body()!!
                     }
                 }

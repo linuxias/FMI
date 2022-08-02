@@ -16,6 +16,7 @@ import androidx.lifecycle.viewModelScope
 import com.linuxias.fmi.databinding.ActivityMainBinding
 import com.linuxias.fmi.repository.AirQualityViewModel
 import com.linuxias.fmi.repository.AirQualityViewModelFactory
+import com.linuxias.fmi.utils.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -81,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             address?.let {
                 binding.locationTitle.text = "${it.countryName}"
                 binding.locationSubtitle.text = it.locality.toString() + " " + it.thoroughfare.toString()
-                viewModel.getAirQualityData(it.latitude.toString(), it.longitude.toString(), "fd135d67-8fbf-4ff2-b6e0-689bee044bd5")
+                viewModel.getAirQualityData(it.latitude.toString(), it.longitude.toString(), getApiKey())
             }
         }
     }
