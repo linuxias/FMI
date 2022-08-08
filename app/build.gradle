@@ -21,7 +21,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "AQ_API_KEY", "\"" + localProperties['AQ_API_KEY'] + "\"")
+            buildConfigField("String", "AQ_API_KEY", "" + localProperties['AQ_API_KEY'] + "")
         }
         release {
             minifyEnabled false
