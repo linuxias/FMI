@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FMI">
         <activity
+            android:name=".MapActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
