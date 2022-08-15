@@ -3,10 +3,14 @@ package com.linuxias.fmi
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
+import android.location.Address
+import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +29,20 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var locationProvider: LocationProvider
     private lateinit var viewModel: AirQualityViewModel
+    private var address: Address? = null
+
+    private val startMapActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult(),
+        object: ActivityResultCallback<ActivityResult>{
+            override fun onActivityResult(result: ActivityResult?) {
+                if ((result?.resultCode ?: 0) == Activity.RESULT_OK) {
+                    val lat = result?.data?.getDoubleExtra("latitude", 0.0) ?: 0.0
+                    val long = result?.data?.getDoubleExtra("longitude", 0.0) ?: 0.0
+
+                    updateSpecificLocationAndTime(lat, long)
+                }
+            }
+        })
 
     val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -72,11 +90,27 @@ class MainActivity : AppCompatActivity() {
         binding.btnRefresh.setOnClickListener {
             updateCurrentLocationAndTime()
         }
+
+        binding.mapBtn.setOnClickListener {
+            val intent = Intent(this, MapActivity::class.java)
+            intent.putExtra("currentLatitude", address!!.latitude)
+            intent.putExtra("currentLongitude", address!!.longitude)
+            startMapActivityResult.launch(intent)
+        }
+    }
+
+    fun updateSpecificLocationAndTime(latitude: Double, longitude: Double) {
+        address = convertGeoToAddress(this, latitude, longitude)
+        address?.let {
+            binding.locationTitle.text = "${it.countryName}"
+            binding.locationSubtitle.text = it.locality.toString() + " " + it.thoroughfare.toString()
+            viewModel.getAirQualityData(it.latitude.toString(), it.longitude.toString(), getApiKey())
+        }
     }
 
     fun updateCurrentLocationAndTime() {
         locationProvider.receiveLocation {
-            val address = convertLocationToAddress(this, it)
+            address = convertLocationToAddress(this, it)
             address?.let {
                 binding.locationTitle.text = "${it.countryName}"
                 binding.locationSubtitle.text = it.locality.toString() + " " + it.thoroughfare.toString()

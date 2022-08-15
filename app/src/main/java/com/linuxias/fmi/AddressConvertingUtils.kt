@@ -23,3 +23,19 @@ fun convertLocationToAddress(context: Context, location: Location): Address? {
 
     return null
 }
+
+fun convertGeoToAddress(context: Context, latitude: Double, longitude: Double): Address? {
+    try {
+        val addresses = Geocoder(context, Locale.getDefault())
+            .getFromLocation(latitude, longitude, 1)
+        return addresses.get(0)
+    } catch (ioExcetption: IOException) {
+        Toast.makeText(context, "Unable to use Geocoder",
+            Toast.LENGTH_SHORT).show()
+    } catch (illegalArgumentException: IllegalArgumentException) {
+        Toast.makeText(context, "Wrong location information",
+            Toast.LENGTH_SHORT).show()
+    }
+
+    return null
+}
