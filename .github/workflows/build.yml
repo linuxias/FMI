@@ -23,12 +23,14 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v2
 
-    - name: Access AQ_API_KEY
+    - name: Access Secret key
       run: |
-        echo AQ_API_KEY=\"$API_KEY\" > local.properties
+        echo AQ_API_KEY=\"$API_KEY\" >> local.properties
+        echo GOOGLE_MAP_KEY=\"$MAP_KEY\" >> local.properties
       shell: bash
       env:
         API_KEY: ${{ secrets.AQ_API_KEY }}
+        MAP_KEY: ${{ secrets.GOOGLE_MAP_KEY }}
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
