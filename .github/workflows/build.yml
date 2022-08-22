@@ -23,6 +23,13 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v2
 
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
+
     - name: Access Secret key
       run: |
         echo AQ_API_KEY=\"$API_KEY\" >> local.properties
