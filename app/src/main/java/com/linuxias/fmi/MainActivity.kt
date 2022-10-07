@@ -15,8 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.linuxias.fmi.databinding.ActivityMainBinding
 import com.linuxias.fmi.repository.AirQualityViewModel
 import com.linuxias.fmi.repository.AirQualityViewModelFactory
@@ -79,10 +78,12 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(AirQualityViewModel::class.java)
 
-        viewModel.viewModelScope.launch {
-            viewModel.airQualityResponse.collect {
-                if (it != null) {
-                    binding.tvCount.text = it.data.current.pollution.aqius.toString()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.airQualityResponse.collect {
+                    if (it != null) {
+                        binding.tvCount.text = it.data.current.pollution.aqius.toString()
+                    }
                 }
             }
         }
