@@ -10,7 +10,7 @@ This project is only for me to practice developing Android apps. I developed bas
 - ViewModel
 - Google Map
 
-### Refernce
+### Reference
 The resources using some image are referenced https://github.com/code-with-joyce/must_have_android only.
 <br>
 The referenced project is very simple in structure and security, so there are many problems. I have improved the structure and improved what will be a security problem to address those problems.
